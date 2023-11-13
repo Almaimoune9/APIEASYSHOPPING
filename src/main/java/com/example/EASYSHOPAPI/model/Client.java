@@ -23,7 +23,10 @@ public class Client {
     private String motdepass;
 
     @Column(nullable = false)
-    private String photo;
+    private String adresse;
+
+    @Column(nullable = false)
+    private String image;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Commentaire> commentaire;

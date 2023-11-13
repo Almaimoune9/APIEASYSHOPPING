@@ -17,6 +17,9 @@ public class Categorie {
     @Column(nullable = false)
     private String nom;
 
+    @Column(nullable = false)
+    private String image;
+
     @ManyToMany(mappedBy = "categories")
     private Set<Fournisseurs> fournisseurs = new HashSet<>();
 

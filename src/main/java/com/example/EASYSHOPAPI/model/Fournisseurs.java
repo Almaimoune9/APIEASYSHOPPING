@@ -25,7 +25,13 @@ public class Fournisseurs {
     @Column(nullable = false, length = 50)
     private String motdepass;
 
+    @Column(nullable = false)
+    private String image;
+
     @ManyToMany
     @JoinColumn(name = "categorie_id")
     private Set<Categorie> categories = new HashSet<>();
+
+    @Column(nullable = false)
+    private String statut;
 }

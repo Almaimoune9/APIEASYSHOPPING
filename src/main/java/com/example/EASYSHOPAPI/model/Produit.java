@@ -20,7 +20,7 @@ public class Produit {
     private String qte;
 
     @Column(nullable = false)
-    private String photo;
+    private String image;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Panier panier;
