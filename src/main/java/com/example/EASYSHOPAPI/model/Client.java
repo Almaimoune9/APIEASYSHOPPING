@@ -1,6 +1,7 @@
 package com.example.EASYSHOPAPI.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class Client {
     private String nom;
 
     @Column(nullable = false)
+    @Email
     private String email;
 
     @Column(nullable = false)

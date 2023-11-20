@@ -17,9 +17,14 @@ public class Panier {
     @Column(nullable = false)
     private String titre;
 
+
     @Column(nullable = false)
     private Date dateLimite;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Produit> produit;
+
+    @ManyToOne
+    @JoinColumn(name = "categorie_id", nullable = false)
+    private Categorie categorie;
 }

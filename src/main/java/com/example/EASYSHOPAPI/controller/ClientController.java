@@ -27,6 +27,7 @@ public class ClientController {
     private ClientServiceImp clientServiceImp;
 
     //Créer un client
+    @CrossOrigin
     @PostMapping("create")
     public ResponseEntity<Client> createClient(@RequestParam("client") String clientString,
                                                @RequestParam (value = "image", required = false)MultipartFile imageFile)

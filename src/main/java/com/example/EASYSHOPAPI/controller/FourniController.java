@@ -89,7 +89,7 @@ public class FourniController {
     }
 
     @PutMapping("/update/{id}")
-    @Operation(summary = "Modifier un client")
+    @Operation(summary = "Modifier un fournisseur")
     public ResponseEntity<Fournisseurs> updateFournisseur(@PathVariable Long id,
                                                @Validated @RequestParam("fournisseur") String fournisseurString,
                                                @RequestParam(value = "image", required = false) MultipartFile imageFile){

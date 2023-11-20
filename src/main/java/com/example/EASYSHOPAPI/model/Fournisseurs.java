@@ -28,9 +28,9 @@ public class Fournisseurs {
     @Column(nullable = false)
     private String image;
 
-    @ManyToMany
+    @OneToOne
     @JoinColumn(name = "categorie_id")
-    private Set<Categorie> categories = new HashSet<>();
+    private Categorie categorie;
 
     @Column(nullable = false)
     private String statut;

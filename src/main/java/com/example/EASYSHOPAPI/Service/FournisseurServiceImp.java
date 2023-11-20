@@ -135,9 +135,6 @@ public class FournisseurServiceImp implements FournisseurService {
         return "Fournisseurs supprimé";
     }
 
-    //Méthode pour vérifier si l'email existe déjà
-    public boolean emailExisteDeja (String email){
-        return fournisseurRepository.existsByEmail(email);
-    }
+
 
 }
