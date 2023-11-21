@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ProduitService {
+    
     Produit createProduit(Produit produit, MultipartFile imageFile) throws Exception;
 
 

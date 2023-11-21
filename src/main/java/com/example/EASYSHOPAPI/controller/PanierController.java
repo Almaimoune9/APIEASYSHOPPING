@@ -11,15 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/panier")
+@CrossOrigin(origins = "http://10.0.2.2:8081")
 public class PanierController {
 
     @Autowired
     private PanierServiceImp panierServiceImp;
 
-    @PostMapping("/create")
-    public ResponseEntity<Panier> createPanier(@RequestBody Panier panier) {
-        Panier createdPanier = panierServiceImp.createPanier(panier);
-        return new ResponseEntity<>(createdPanier, HttpStatus.CREATED);
+    @PostMapping("create")
+    public String create(@RequestBody Panier panier){
+        return panierServiceImp.createPanier(panier);
     }
 
     @CrossOrigin

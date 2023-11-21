@@ -1,5 +1,8 @@
 package com.example.EASYSHOPAPI.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +26,7 @@ public class Produit {
     private String image;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {"panier_id"})
     private Panier panier;
 
 }

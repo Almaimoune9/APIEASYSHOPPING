@@ -27,8 +27,9 @@ public class ProduitController {
     @Autowired
     private ProduitServiceImp produitServiceImp;
 
-    @PostMapping("create")
+    @PostMapping("/create")
     @Operation(summary = "Creation d'un produit")
+    @CrossOrigin(origins = "http://10.0.2.2:8081")
     public ResponseEntity<Produit> createProduit(@RequestParam("produit") String produitString,
                                                  @RequestParam(value = "image", required = false)MultipartFile imageFile)
         throws Exception{

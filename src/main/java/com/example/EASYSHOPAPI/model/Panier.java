@@ -6,6 +6,10 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
 @Entity
 @Data
 public class Panier {
@@ -22,9 +26,10 @@ public class Panier {
     private Date dateLimite;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Produit> produit;
 
     @ManyToOne
-    @JoinColumn(name = "categorie_id", nullable = false)
+    @JsonIgnoreProperties(value = {"categorie_id"})
     private Categorie categorie;
 }

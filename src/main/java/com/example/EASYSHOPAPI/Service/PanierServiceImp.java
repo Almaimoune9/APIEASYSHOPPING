@@ -1,5 +1,6 @@
 package com.example.EASYSHOPAPI.Service;
 
+import com.example.EASYSHOPAPI.model.Categorie;
 import com.example.EASYSHOPAPI.model.Panier;
 import com.example.EASYSHOPAPI.model.Produit;
 import com.example.EASYSHOPAPI.repository.PanierRepository;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,15 +26,31 @@ public class PanierServiceImp implements PanierService{
     @Autowired
     private PanierRepository panierRepository;
 
-    public Panier createPanier(Panier panier){
-        return panierRepository.save(panier);
+
+    public String createPanier(Panier panier) {
+        try {
+            if (panier != null && panier.getTitre() != null && !panier.getTitre().trim().isEmpty()) {
+                Panier existingPanier = panierRepository.getByTitre(panier.getTitre());
+    
+                if (existingPanier == null) {
+                    panierRepository.save(panier);
+                    return "Panier créé avec succès";
+                } else {
+                    return "Panier existe déjà!";
+                }
+            } else {
+                return "Le nom ne doit pas être vide";
+            }
+        } catch (RuntimeException e) {
+            return "Erreur lors de la création du panier: " + e.getMessage();
+        }
     }
 
     public Produit ajouterProduitAuPanier(Long panierId, Produit produit, MultipartFile imageFile) throws Exception {
         Panier panier = panierRepository.findById(panierId)
                 .orElseThrow(() -> new RuntimeException("Panier introuvable avec ID : " + panierId));
 
-        if (produitRepository.findProduitByNom(produit.getNom()) == null) {
+        if (produitRepository.findByNom(produit.getNom()) == null) {
             if (imageFile != null) {
                 String imageLocation = "C:\\xampp\\htdocs\\easy_shopping";
 
@@ -58,5 +76,10 @@ public class PanierServiceImp implements PanierService{
         } else {
             throw new IllegalArgumentException("Ce produit " + produit.getNom() + " existe déjà");
         }
+    }
+
+    @Override
+    public Optional<Panier> findById(Long id) {
+        return panierRepository.findById(id);
     }
 }

@@ -16,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,10 +27,12 @@ public class ProduitServiceImp implements ProduitService {
 
     @Override
     public Produit createProduit(Produit produit, MultipartFile imageFile) throws Exception {
-        if (produitRepository.findProduitByNom(produit.getNom()) == null) {
+        System.out.println("je suis");
+Optional<Produit> produitExist = produitRepository.findProduitByNom(produit.getNom());
+        if (produitExist != null) {
             if (imageFile != null) {
                 String imageLocation = "C:\\xampp\\htdocs\\easy_shopping";
-
+System.out.println(imageLocation);
                 try {
                     Path imageRootLocation = Paths.get(imageLocation);
                     if (!Files.exists(imageRootLocation)) {
@@ -38,7 +41,7 @@ public class ProduitServiceImp implements ProduitService {
                     String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
 
                     Path imagePath = imageRootLocation.resolve(imageName);
-
+System.out.println(imageName);
                     Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
                     produit.setImage("http://localhost/easy_shopping/images/" + imageName);

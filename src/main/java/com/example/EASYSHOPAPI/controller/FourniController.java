@@ -1,7 +1,6 @@
 package com.example.EASYSHOPAPI.controller;
 
 import com.example.EASYSHOPAPI.Service.FournisseurServiceImp;
-import com.example.EASYSHOPAPI.model.Client;
 import com.example.EASYSHOPAPI.model.Fournisseurs;
 import com.example.EASYSHOPAPI.repository.FournisseurRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

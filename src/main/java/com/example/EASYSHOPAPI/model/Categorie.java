@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -25,7 +23,7 @@ public class Categorie {
     @OneToMany(mappedBy = "categorie")
     private List<Fournisseurs> fournisseurs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL)
-    private Set<Panier> paniers;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Panier> paniers;
 
 }
