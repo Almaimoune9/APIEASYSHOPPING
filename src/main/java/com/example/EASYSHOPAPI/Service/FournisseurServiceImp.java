@@ -1,13 +1,16 @@
 package com.example.EASYSHOPAPI.Service;
 
+import com.example.EASYSHOPAPI.model.Categorie;
 import com.example.EASYSHOPAPI.model.Client;
 import com.example.EASYSHOPAPI.model.Fournisseurs;
+import com.example.EASYSHOPAPI.repository.CategorieRepository;
 import com.example.EASYSHOPAPI.repository.FournisseurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.webjars.NotFoundException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,16 +19,27 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 public class FournisseurServiceImp implements FournisseurService {
 
     @Autowired
     private FournisseurRepository fournisseurRepository;
 
+    @Autowired
+    private CategorieRepository categorieRepository;
+
     @Override
-    public Fournisseurs createFournisseurs(Fournisseurs fournisseurs, MultipartFile imageFile) throws Exception {
+    public Fournisseurs createFournisseurs(Fournisseurs fournisseurs, MultipartFile imageFile, Long categorieId) throws Exception {
         try {
-            fournisseurs.setStatut("en attente");
+            // Récupérer la catégorie à partir de la base de données
+            Categorie categorie = categorieRepository.findById(categorieId)
+                    .orElseThrow(() -> new NotFoundException("La catégorie avec l'ID " + categorieId + " n'a pas été trouvée"));
+
+            // Associer la catégorie au fournisseur
+            fournisseurs.setCategorie(categorie);
+            //fournisseurs.setStatut("en attente");
 
             // Traitement de l'image s'il est fourni
             if (imageFile != null) {
@@ -50,7 +64,7 @@ public class FournisseurServiceImp implements FournisseurService {
         }
     }
 
-    @Override
+   /* @Override
     public List<Fournisseurs> getFournisseursEnAttente() {
         return fournisseurRepository.findByStatut("en attente");
     }
@@ -63,9 +77,9 @@ public class FournisseurServiceImp implements FournisseurService {
             e.printStackTrace();
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public ResponseEntity<String> accepterFournisseur(long id) {
         try {
             Optional<Fournisseurs> optionalFournisseur = fournisseurRepository.findById(id);
@@ -81,7 +95,7 @@ public class FournisseurServiceImp implements FournisseurService {
             e.printStackTrace();
             return new ResponseEntity<>("Erreur lors de l'acceptation du fournisseur : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
 
 
 

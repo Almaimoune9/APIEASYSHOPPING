@@ -9,8 +9,8 @@ import java.util.Optional;
 public interface CategorieRepository extends JpaRepository<Categorie, Long> {
 
 
-    Optional<Categorie> findCategorieById(Long id);
+    Categorie findCategorieById(Long id);
 
-    Client findCategorieByNom(String nom);
+    Categorie findCategorieByNom(String nom);
 
 }

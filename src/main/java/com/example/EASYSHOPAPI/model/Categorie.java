@@ -1,5 +1,6 @@
 package com.example.EASYSHOPAPI.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,10 +21,16 @@ public class Categorie {
     @Column(nullable = false)
     private String image;
 
-    @OneToMany(mappedBy = "categorie")
-    private List<Fournisseurs> fournisseurs = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "categorie" ,cascade = CascadeType.ALL)
+    private List<Fournisseurs> fournisseurs;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     private List<Panier> paniers;
+
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Notification> notifications;
 
 }

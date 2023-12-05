@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/categoie")
+@RequestMapping("/api/categoie/")
 public class CategorieController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class CategorieController {
     private CategorieService categorieService;
 
     //Créer une categorie
-    @PostMapping("create")
+    @PostMapping("/create")
     @Operation(summary = "Créer une categorie")
     public ResponseEntity<Categorie> createCategorie(@RequestParam ("categorie") String categorieString,
                                                      @RequestParam(value = "image", required = false)MultipartFile imageFile)
@@ -56,7 +56,7 @@ public class CategorieController {
 
     @GetMapping("cat/{id}")
     @Operation(summary = "Lire une catégorie")
-    public Optional<Categorie> getCatById(@PathVariable Long id){
+    public Categorie getCatById(@PathVariable Long id){
         return categorieRepository.findCategorieById(id);
     }
 

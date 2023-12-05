@@ -1,11 +1,14 @@
 package com.example.EASYSHOPAPI.Service;
 
+import com.example.EASYSHOPAPI.model.Panier;
 import com.example.EASYSHOPAPI.model.Produit;
+import com.example.EASYSHOPAPI.repository.PanierRepository;
 import com.example.EASYSHOPAPI.repository.ProduitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,41 +22,59 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 public class ProduitServiceImp implements ProduitService {
 
     @Autowired
     private ProduitRepository produitRepository;
 
+    @Autowired
+    private  PanierRepository panierRepository;
+
+
     @Override
     public Produit createProduit(Produit produit, MultipartFile imageFile) throws Exception {
-        System.out.println("je suis");
-Optional<Produit> produitExist = produitRepository.findProduitByNom(produit.getNom());
-        if (produitExist != null) {
-            if (imageFile != null) {
-                String imageLocation = "C:\\xampp\\htdocs\\easy_shopping";
-System.out.println(imageLocation);
-                try {
-                    Path imageRootLocation = Paths.get(imageLocation);
-                    if (!Files.exists(imageRootLocation)) {
-                        Files.createDirectories(imageRootLocation);
-                    }
-                    String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
-
-                    Path imagePath = imageRootLocation.resolve(imageName);
-System.out.println(imageName);
-                    Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-                    produit.setImage("http://localhost/easy_shopping/images/" + imageName);
-                } catch (IOException e) {
-                    throw new Exception("Erreur lors du traitement de l'image: " + e.getMessage());
-                }
-            }
-            return produitRepository.save(produit);
-        } else {
-            throw new IllegalArgumentException("Ce produit " + produit.getNom() + "existe deja");
+        //Verifier si le produit existe
+        Panier panier = panierRepository.findById(produit.getPanier().getPanierId()).orElseThrow(() -> new IllegalArgumentException("Panier non trouvé avec l'id " + produit.getPanier().getPanierId()));
+        //Verifie si le produit existe dans le panier
+        Optional<Produit> produitExist = produitRepository.findByNomAndPanier(produit.getNom(), panier);
+        if (produitExist.isPresent()) {
+            throw new Exception("Le produit " + produit.getNom() + "existe dans ce panier" + panier.getTitre());
         }
+
+        //Optional<Produit> existingProduit = produitRepository.findProduitByNom(produit.getNom());
+
+        //if (existingProduit.isEmpty()) {
+        // if (imageFile != null) {
+        //if (produitExist != null) {
+        if (imageFile != null) {
+            String imageLocation = "C:\\xampp\\htdocs\\easy_shopping";
+            try {
+                Path imageRootLocation = Paths.get(imageLocation);
+                if (!Files.exists(imageRootLocation)) {
+                    Files.createDirectories(imageRootLocation);
+                }
+                String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+
+                Path imagePath = imageRootLocation.resolve(imageName);
+                Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+
+                produit.setImage("http://localhost/easy_shopping/images/" + imageName);
+            } catch (IOException e) {
+                throw new Exception("Erreur lors du traitement de l'image: " + e.getMessage());
+            }
+
+        }
+
+
+        return produitRepository.save(produit);
     }
+      //  } else {
+        //    throw new IllegalArgumentException("Ce produit " + produit.getNom() + "existe deja");
+       // }
+   // }
 
     @Override
     public Produit updateProduit(Long id, Produit produit, MultipartFile imageFile) throws Exception {

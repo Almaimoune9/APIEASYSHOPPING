@@ -56,8 +56,9 @@ public class CategorieServiceImp implements CategorieService{
     @Override
     public Categorie updatecategorie(Long id, Categorie categorie, MultipartFile imageFile) throws Exception {
         try {
-            Categorie categorieExiste = categorieRepository.findCategorieById(id)
-                    .orElseThrow(() -> new NoSuchElementException("Ctégorie non trouvé avec l'id: " +id));
+            Categorie categorieExiste = categorieRepository.findCategorieById(id);
+            if (categorieExiste == null)
+                throw new NoSuchElementException("Ctégorie non trouvé avec l'id: " +id);
             categorieExiste.setNom(categorie.getNom());
 
             if (imageFile != null){

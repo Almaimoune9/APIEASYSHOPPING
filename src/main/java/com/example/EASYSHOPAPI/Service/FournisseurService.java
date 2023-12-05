@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface FournisseurService {
 
-    Fournisseurs createFournisseurs(Fournisseurs fournisseurs, MultipartFile imageFile) throws Exception;
+    Fournisseurs createFournisseurs(Fournisseurs fournisseurs, MultipartFile imageFile, Long categorieId) throws Exception;
 
-    List<Fournisseurs> getFournisseursEnAttente();
+    //List<Fournisseurs> getFournisseursEnAttente();
 
-    ResponseEntity<List<Fournisseurs>> getFournisseursByStatut(String statut);
+    //ResponseEntity<List<Fournisseurs>> getFournisseursByStatut(String statut);
 
-    ResponseEntity<String> accepterFournisseur(long id);
+    //ResponseEntity<String> accepterFournisseur(long id);
 
     //ListeFournisseurs
     ResponseEntity<List <Fournisseurs>> getAllFournisseurs();

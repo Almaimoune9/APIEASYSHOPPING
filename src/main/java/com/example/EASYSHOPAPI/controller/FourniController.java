@@ -1,6 +1,7 @@
 package com.example.EASYSHOPAPI.controller;
 
 import com.example.EASYSHOPAPI.Service.FournisseurServiceImp;
+import com.example.EASYSHOPAPI.model.Client;
 import com.example.EASYSHOPAPI.model.Fournisseurs;
 import com.example.EASYSHOPAPI.repository.FournisseurRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/fournisseur")
+@RequestMapping("/api/fournisseurs/")
 public class FourniController {
 
     @Autowired
@@ -26,24 +27,23 @@ public class FourniController {
     @Autowired
     private FournisseurServiceImp fournisseurServiceImp;
 
-    public FourniController(FournisseurRepository fournisseurRepository){
-        this.fournisseurRepository= fournisseurRepository;
-    }
+    //public FourniController(FournisseurRepository fournisseurRepository){
+      //  this.fournisseurRepository= fournisseurRepository;
+    //}
 
+    @CrossOrigin
     @PostMapping("create")
-    @Operation(summary = "Créer un fournissuer")
-    public ResponseEntity<String> createFournisseur(@RequestParam ("fournisseur") String fournisseurString,
-                                                    @RequestParam(value = "image", required = false) MultipartFile imageFile)
-        throws Exception{
+    public ResponseEntity<Fournisseurs> createFournisseur(@RequestParam("fournisseurs") String fournisseurString,
+                                               @RequestParam (value = "image", required = false)MultipartFile imageFile, @RequestParam("categorieId") Long categorieId)
+            throws Exception{
         Fournisseurs fournisseurs = new Fournisseurs();
         try {
             fournisseurs = new JsonMapper().readValue(fournisseurString, Fournisseurs.class);
         } catch (JsonProcessingException e){
             throw new Exception(e.getMessage());
         }
-        Fournisseurs savedFournisseur = fournisseurServiceImp.createFournisseurs(fournisseurs, imageFile);
-        String responseMessage = "Fournisseurs créer avec succés, en atente d'approbation";
-        return new ResponseEntity<>(responseMessage, HttpStatus.CREATED);
+        Fournisseurs savedFournisseur = fournisseurServiceImp.createFournisseurs(fournisseurs, imageFile, categorieId);
+        return  new ResponseEntity<>(savedFournisseur, HttpStatus.CREATED);
     }
 
     //Méthode pour la connexion
@@ -64,7 +64,7 @@ public class FourniController {
         }
     }
 
-    @GetMapping("liste")
+    @GetMapping("/liste")
     @Operation(summary = "Afficher la liste des fournisseurs")
     public ResponseEntity<List<Fournisseurs>> listeFournisseur(){
         return fournisseurServiceImp.getAllFournisseurs();
@@ -75,17 +75,17 @@ public class FourniController {
     public Optional<Fournisseurs> getFourniById(@PathVariable Long id){
         return fournisseurRepository.findFournisseursById(id);
     }
-    @GetMapping("/fournisseurs/enAttente")
+    /*@GetMapping("/fournisseurs/enAttente")
     public ResponseEntity<List<Fournisseurs>> getFournisseursEnAttente() {
         List<Fournisseurs> fournisseursEnAttente = fournisseurServiceImp.getFournisseursEnAttente();
         return new ResponseEntity<>(fournisseursEnAttente, HttpStatus.OK);
-    }
+    }*/
 
-    @PutMapping("/{id}/accepter")
+    /*@PutMapping("/{id}/accepter")
     @Operation(summary = "Approuver un fournisseur ")
     public ResponseEntity<String> accepterFournisseur(@PathVariable long id) {
         return fournisseurServiceImp.accepterFournisseur(id);
-    }
+    }*/
 
     @PutMapping("/update/{id}")
     @Operation(summary = "Modifier un fournisseur")

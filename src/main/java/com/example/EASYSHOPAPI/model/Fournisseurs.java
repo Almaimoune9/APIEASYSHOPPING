@@ -28,10 +28,10 @@ public class Fournisseurs {
     @Column(nullable = false)
     private String image;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "categorie_id")
     private Categorie categorie;
 
-    @Column(nullable = false)
-    private String statut;
+    //@Column(nullable = false)
+    //private String statut;
 }

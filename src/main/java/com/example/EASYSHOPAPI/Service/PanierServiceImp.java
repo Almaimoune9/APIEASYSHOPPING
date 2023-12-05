@@ -1,21 +1,20 @@
 package com.example.EASYSHOPAPI.Service;
 
-import com.example.EASYSHOPAPI.model.Categorie;
-import com.example.EASYSHOPAPI.model.Panier;
-import com.example.EASYSHOPAPI.model.Produit;
+import com.example.EASYSHOPAPI.model.*;
+import com.example.EASYSHOPAPI.repository.CategorieRepository;
 import com.example.EASYSHOPAPI.repository.PanierRepository;
 import com.example.EASYSHOPAPI.repository.ProduitRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class PanierServiceImp implements PanierService{
@@ -26,60 +25,95 @@ public class PanierServiceImp implements PanierService{
     @Autowired
     private PanierRepository panierRepository;
 
+    @Autowired
+    private EmailService emailService;
 
-    public String createPanier(Panier panier) {
+    @Autowired
+    private CategorieRepository categorieRepository;
+
+    @Override
+    public ResponseEntity<Integer> createPanier(Panier panier) {
         try {
             if (panier != null && panier.getTitre() != null && !panier.getTitre().trim().isEmpty()) {
                 Panier existingPanier = panierRepository.getByTitre(panier.getTitre());
-    
+
                 if (existingPanier == null) {
-                    panierRepository.save(panier);
-                    return "Panier créé avec succès";
+                    Panier panier1 = panierRepository.save(panier);
+                    sendPanierCreationEmail(panier1);
+
+                    // Retourner explicitement l'ID du panier
+                    return new ResponseEntity<>(panier.getPanierId(), HttpStatus.CREATED);
                 } else {
-                    return "Panier existe déjà!";
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
             } else {
-                return "Le nom ne doit pas être vide";
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         } catch (RuntimeException e) {
-            return "Erreur lors de la création du panier: " + e.getMessage();
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    private void sendPanierCreationEmail(Panier panier){
+        Categorie categorie = categorieRepository.findCategorieById(panier.getCategorie().getId());
+        List<Fournisseurs> fournisseurs = categorie.getFournisseurs();
+
+        for (Fournisseurs fournisseur :fournisseurs){
+            String emailAddress = fournisseur.getEmail();
+            String sujet = "Nouveau panier créé : " + panier.getTitre();
+            String message = "Un nouveau panier a été créé avec le titre : " + panier.getTitre() + ". La date limite de livraison est: "+ panier.getDateLivraison() + ". Vous pouvez faire des propositions";
+
+            emailService.sendSimpleMail(new EmailDetail(emailAddress, sujet, message));
         }
     }
 
-    public Produit ajouterProduitAuPanier(Long panierId, Produit produit, MultipartFile imageFile) throws Exception {
+
+
+
+    public Produit ajouterProduitAuPanier(Integer panierId, String produitJson, MultipartFile imageFile) throws Exception {
         Panier panier = panierRepository.findById(panierId)
                 .orElseThrow(() -> new RuntimeException("Panier introuvable avec ID : " + panierId));
 
-        if (produitRepository.findByNom(produit.getNom()) == null) {
-            if (imageFile != null) {
-                String imageLocation = "C:\\xampp\\htdocs\\easy_shopping";
+        ObjectMapper objectMapper = new ObjectMapper();
+        Produit produit = objectMapper.readValue(produitJson, Produit.class);
 
-                try {
-                    Path imageRootLocation = Paths.get(imageLocation);
-                    if (!Files.exists(imageRootLocation)) {
-                        Files.createDirectories(imageRootLocation);
-                    }
-                    String imageName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+        try {
 
-                    Path imagePath = imageRootLocation.resolve(imageName);
-
-                    Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-                    produit.setImage("http://localhost/easy_shopping/images/" + imageName);
-                } catch (IOException e) {
-                    throw new Exception("Erreur lors du traitement de l'image: " + e.getMessage());
-                }
+            if (produitRepository.findProduitByNom(produit.getNom()) == null) {
+                return produitRepository.save(produit);
+            } else {
+                throw new IllegalArgumentException("Ce produit " + produit.getNom() + " existe déjà");
             }
-
-            produit.setPanier(panier);
-            return produitRepository.save(produit);
-        } else {
-            throw new IllegalArgumentException("Ce produit " + produit.getNom() + " existe déjà");
+        } catch (Exception e) {
+            throw new Exception("Erreur lors de l'ajout du produit au panier : " + e.getMessage());
         }
     }
 
     @Override
-    public Optional<Panier> findById(Long id) {
+    public Optional<Panier> findById(Integer id) {
         return panierRepository.findById(id);
+    }
+
+    @Override
+    public ResponseEntity<List<Panier>> listePanier() {
+        return new ResponseEntity<>(panierRepository.findAll(), HttpStatus.OK);
+    }
+
+    //@Override
+    //public String delete(Integer panierId) {
+     //   panierRepository.deleteById(panierId);
+      //  return "Panier supprimé avec succès";
+   // }
+
+    @Override
+    @Transactional
+    public String delete(Integer panierId) {
+        // Supprimer les produits liés au panier
+        produitRepository.deleteByPanier_PanierId(panierId);
+
+        // Ensuite, supprimer le panier lui-même
+        panierRepository.deleteById(panierId);
+
+        return "Panier et produits associés supprimés avec succès";
     }
 }
